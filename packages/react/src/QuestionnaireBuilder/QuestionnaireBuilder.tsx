@@ -1,5 +1,5 @@
 import { Anchor, Box, Button, createStyles, NativeSelect, Space, Textarea, TextInput, Title } from '@mantine/core';
-import { globalSchema, IndexedStructureDefinition, isResource as isResourceType } from '@medplum/core';
+import { getElementDefinition, isResource as isResourceType } from '@medplum/core';
 import {
   Coding,
   Extension,
@@ -11,12 +11,12 @@ import {
 import React, { useEffect, useRef, useState } from 'react';
 import { Form } from '../Form/Form';
 import { useMedplum } from '../MedplumProvider/MedplumProvider';
+import { QuestionnaireFormItem } from '../QuestionnaireForm/QuestionnaireFormItem/QuestionnaireFormItem';
 import { getValueAndType } from '../ResourcePropertyDisplay/ResourcePropertyDisplay';
 import { ResourcePropertyInput } from '../ResourcePropertyInput/ResourcePropertyInput';
 import { useResource } from '../useResource/useResource';
 import { killEvent } from '../utils/dom';
 import { isChoiceQuestion, QuestionnaireItemType } from '../utils/questionnaire';
-import { QuestionnaireFormItem } from '../QuestionnaireForm/QuestionnaireFormItem/QuestionnaireFormItem';
 
 const useStyles = createStyles((theme) => ({
   section: {
@@ -79,7 +79,7 @@ export interface QuestionnaireBuilderProps {
 export function QuestionnaireBuilder(props: QuestionnaireBuilderProps): JSX.Element | null {
   const medplum = useMedplum();
   const defaultValue = useResource(props.questionnaire);
-  const [schema, setSchema] = useState<IndexedStructureDefinition | undefined>();
+  const [schemaLoaded, setSchemaLoaded] = useState(false);
   const [value, setValue] = useState<Questionnaire>();
   const [selectedKey, setSelectedKey] = useState<string>();
   const [hoverKey, setHoverKey] = useState<string>();
@@ -93,7 +93,10 @@ export function QuestionnaireBuilder(props: QuestionnaireBuilderProps): JSX.Elem
   }
 
   useEffect(() => {
-    medplum.requestSchema('Questionnaire').then(setSchema).catch(console.log);
+    medplum
+      .requestSchema('Questionnaire')
+      .then(() => setSchemaLoaded(true))
+      .catch(console.log);
   }, [medplum]);
 
   useEffect(() => {
@@ -106,7 +109,7 @@ export function QuestionnaireBuilder(props: QuestionnaireBuilderProps): JSX.Elem
     };
   }, [defaultValue]);
 
-  if (!schema || !value) {
+  if (!schemaLoaded || !value) {
     return null;
   }
 
@@ -380,7 +383,7 @@ interface AnswerBuilderProps {
 }
 
 function AnswerBuilder(props: AnswerBuilderProps): JSX.Element {
-  const property = globalSchema.types['QuestionnaireItemAnswerOption'].properties['value[x]'];
+  const property = getElementDefinition('QuestionnaireItemAnswerOption', 'value[x]');
   const options = props.item.answerOption ?? [];
   return (
     <div>

@@ -11,6 +11,7 @@ import {
   forbidden,
   formatSearchQuery,
   getSearchParameterDetails,
+  getSearchParameters,
   getStatus,
   gone,
   isGone,
@@ -46,6 +47,7 @@ import {
   SearchParameter,
   StructureDefinition,
 } from '@medplum/fhirtypes';
+import { AsyncLocalStorage } from 'async_hooks';
 import { randomUUID } from 'crypto';
 import { Pool, PoolClient } from 'pg';
 import { applyPatch, Operation } from 'rfc6902';
@@ -81,8 +83,6 @@ import { validateReferences } from './references';
 import { rewriteAttachments, RewriteMode } from './rewrite';
 import { buildSearchExpression, getFullUrl, searchImpl } from './search';
 import { Condition, DeleteQuery, Disjunction, Expression, InsertQuery, Operator, SelectQuery } from './sql';
-import { getSearchParameters } from './structure';
-import { AsyncLocalStorage } from 'async_hooks';
 
 /**
  * The RepositoryContext interface defines standard metadata for repository actions.

@@ -6,16 +6,17 @@ import {
   FhirFilterConnective,
   FhirFilterExpression,
   FhirFilterNegation,
-  Operator,
   Filter,
   forbidden,
   formatSearchQuery,
   getDataType,
   getReferenceString,
+  getSearchParameter,
   getSearchParameterDetails,
   IncludeTarget,
   isResource,
   OperationOutcomeError,
+  Operator,
   parseFilterParameter,
   PropertyType,
   SearchParameterDetails,
@@ -35,6 +36,7 @@ import {
   ResourceType,
   SearchParameter,
 } from '@medplum/fhirtypes';
+import validator from 'validator';
 import { getConfig } from '../config';
 import { getClient } from '../database';
 import { deriveIdentifierSearchParameter } from './lookups/util';
@@ -47,11 +49,9 @@ import {
   Disjunction,
   Expression,
   Negation,
-  Operator as SQL,
   SelectQuery,
+  Operator as SQL,
 } from './sql';
-import { getSearchParameter } from './structure';
-import validator from 'validator';
 
 /**
  * Defines the maximum number of resources returned in a single search result.
